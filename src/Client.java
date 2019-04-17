@@ -27,6 +27,9 @@ public class Client {
         
         Move testPos = worldToLocalPosition(new Move(myPlayerNumber, 2,4));
         System.out.println(testPos.x + " " + testPos.y);
+        
+        Move testPosBack = localToWorldPosition(testPos);
+        System.out.println(testPosBack.x + " " + testPosBack.y);
         // Start the thinking
         //update();
 	}
@@ -83,10 +86,19 @@ public class Client {
 		return new Move(client.getMyPlayerNumber(),newX,newY);
 	}
 	
-	// TODO
 	private Move localToWorldPosition(Move move) {
-		
-		return null;
+		int newX = move.x;
+		int newY = move.y;
+        switch (myPlayerNumber) {
+            case 1:  newX = move.y; newY = 6 - move.x; // check
+                     break;
+            case 2:  newX = 6 - move.x; newY = 6 - move.y; // check
+                     break;
+            case 3:  newX = 6 - move.y; newY = move.x; // check
+            		 break;
+        }
+        
+		return new Move(client.getMyPlayerNumber(),newX,newY);
 	}
 
 
