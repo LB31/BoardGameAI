@@ -9,29 +9,15 @@ import javax.imageio.ImageIO;
 import lenz.htw.sawhian.Move;
 import lenz.htw.sawhian.net.NetworkClient;
 
-public class Client {
+public class Client extends Thread {
 	private NetworkClient client;
 	private int myPlayerNumber;
+	private String name;
 	
 	private int[][] playField = new int[7][7];
 
 	public Client(String name) throws IOException {
-        // for testing
-        fillPlayFiled();
-        System.out.println(Arrays.deepToString(playField).replace("], ", "]\n"));
-		
-        BufferedImage logo = ImageIO.read(new File("./phoenix.png"));
-        client = new NetworkClient(null, name, logo);
-        myPlayerNumber = client.getMyPlayerNumber();
-        System.out.println("Player " + myPlayerNumber);
-        
-        Move testPos = worldToLocalPosition(new Move(myPlayerNumber, 2,4));
-        System.out.println(testPos.x + " " + testPos.y);
-        
-        Move testPosBack = localToWorldPosition(testPos);
-        System.out.println(testPosBack.x + " " + testPosBack.y);
-        // Start the thinking
-        //update();
+		this.name = name;
 	}
 	
 	// for testing
@@ -99,11 +85,40 @@ public class Client {
         }
         
 		return new Move(client.getMyPlayerNumber(),newX,newY);
+
 	}
 
-
+	public void run(){
+        // for testing
+        fillPlayFiled();
+        System.out.println(Arrays.deepToString(playField).replace("], ", "]\n"));
+		
+        BufferedImage logo = null;
+		try {
+			logo = ImageIO.read(new File("./phoenix.png"));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        client = new NetworkClient(null, name, logo);
+        myPlayerNumber = client.getMyPlayerNumber();
+        System.out.println("Player " + myPlayerNumber);
+        
+        Move testPos = worldToLocalPosition(new Move(myPlayerNumber, 2,4));
+        System.out.println(testPos.x + " " + testPos.y);
+        
+        Move testPosBack = localToWorldPosition(testPos);
+        System.out.println(testPosBack.x + " " + testPosBack.y);
+        // Start the thinking
+        //update();
+	    }
         
         public static void main(String[] args) throws IOException {
-        	new Client("1");
+        	for (int i = 0; i <= 4; i++) {
+          	  Client player = new Client("Player" + i);
+          	  player.start();
+			}
+
+        	  
         }
 }
