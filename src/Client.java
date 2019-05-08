@@ -11,20 +11,20 @@ import lenz.htw.sawhian.net.NetworkClient;
 
 public class Client extends Thread {
 	private NetworkClient client;
-	private int myPlayerNumber;
-	private String name;
+	/*private*/ public int myPlayerNumber;
+	private String myName;
 	
-	private int[][] playField = new int[7][7];
+	/*private*/ public int[][] playField = new int[7][7];
 
 	public Client(String name) throws IOException {
-		this.name = name;
+		this.myName = name;
 	}
 	
 	// for testing
 	private void fillPlayFiled() {
 		for (int i = 0; i < playField.length; i++) {
 			for (int j = 0; j < playField.length; j++) {
-				playField[i][j] = (int)(Math.random() * 50 + 1);
+				playField[i][j] = -1; //(int)(Math.random() * 50 + 1);
 			}
 		}
 	}
@@ -47,16 +47,34 @@ public class Client extends Thread {
 	
 	// TODO
 	private void updatePlayField(Move move) {
+        switch (move.player) {
+        case 0:  move.y += 1;
+        		 break;
+        case 1:  move.x += 1;
+                 break;
+        case 2:  move.y -= 1;
+                 break;
+        case 3:  move.x -= 1;
+        		 break;
+    }
+		Move pos = worldToLocalPosition(move);
+		playField[pos.x][pos.y] = pos.player;
+
+		
+		// For testing
+		System.out.println(Arrays.deepToString(playField).replace("], ", "]\n").replace("[[", "[").replace("]]", "]"));
+		System.out.println("For player " + myPlayerNumber + " with name " + myName);
 		
 	}
 	
 	// TODO
 	private Move calculateNextMove() {
+		Move newMove = localToWorldPosition(new Move(myPlayerNumber, 0, 0));
 		
-		return new Move(client.getMyPlayerNumber(),0,0);
+		return newMove;
 	}
 	
-	// When getting real coordinates to transform them in absolute ones
+
 	private Move worldToLocalPosition(Move move) { 
 		int newX = move.x;
 		int newY = move.y;
@@ -69,7 +87,7 @@ public class Client extends Thread {
             		 break;
         }
         
-		return new Move(client.getMyPlayerNumber(),newX,newY);
+		return new Move(move.player, newX, newY);
 	}
 	
 	private Move localToWorldPosition(Move move) {
@@ -84,15 +102,20 @@ public class Client extends Thread {
             		 break;
         }
         
-		return new Move(client.getMyPlayerNumber(),newX,newY);
+		return new Move(move.player, newX, newY);
 
+	}
+	
+	
+	private Move Rotate(Move pos, int degrees) {
+		double newX, newY;
+		newX = pos.x * Math.cos(Math.toRadians(degrees)) - pos.y * Math.sin(Math.toRadians(degrees));
+		newY = pos.x * Math.sin(Math.toRadians(degrees)) + pos.y * Math.cos(Math.toRadians(degrees));
+		return new Move(pos.player, (int)newX, (int)newY);
 	}
 
 	public void run(){
-        // for testing
-        fillPlayFiled();
-        System.out.println(Arrays.deepToString(playField).replace("], ", "]\n"));
-		
+
         BufferedImage logo = null;
 		try {
 			logo = ImageIO.read(new File("./phoenix.png"));
@@ -100,25 +123,30 @@ public class Client extends Thread {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-        client = new NetworkClient(null, name, logo);
+		
+        client = new NetworkClient(null, myName, logo);
         myPlayerNumber = client.getMyPlayerNumber();
-        System.out.println("Player " + myPlayerNumber);
-        
-        Move testPos = worldToLocalPosition(new Move(myPlayerNumber, 2,4));
-        System.out.println(testPos.x + " " + testPos.y);
-        
-        Move testPosBack = localToWorldPosition(testPos);
-        System.out.println(testPosBack.x + " " + testPosBack.y);
+        System.out.println("I am player " + myPlayerNumber);
+
+        fillPlayFiled();
         // Start the thinking
-        //update();
+        update();
+        
 	    }
         
         public static void main(String[] args) throws IOException {
-        	for (int i = 0; i <= 4; i++) {
-          	  Client player = new Client("Player" + i);
-          	  player.start();
-			}
-
+//        	for (int i = 0; i < 4; i++) {
+//          	  Client player = new Client("Player" + i);
+//          	  player.start();
+//			}
+        	Client test = new Client("Clint");
+        	test.fillPlayFiled();
+        	test.playField[0][0] = 5;
+        	test.myPlayerNumber = 3;
+        	Move tester = new Move(3, 0, 0);
+        	Move test1 = test.worldToLocalPosition(tester);
+        	Move test2 = test.Rotate(tester, 90);
+        	System.out.println(test1.y + " " + test2.y);
         	  
         }
 }
