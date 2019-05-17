@@ -135,18 +135,10 @@ public class Client extends Thread {
 	    }
         
         public static void main(String[] args) throws IOException {
-//        	for (int i = 0; i < 4; i++) {
-//          	  Client player = new Client("Player" + i);
-//          	  player.start();
-//			}
-        	Client test = new Client("Clint");
-        	test.fillPlayFiled();
-        	test.playField[0][0] = 5;
-        	test.myPlayerNumber = 3;
-        	Move tester = new Move(3, 0, 0);
-        	Move test1 = test.worldToLocalPosition(tester);
-        	Move test2 = test.Rotate(tester, 90);
-        	System.out.println(test1.y + " " + test2.y);
+        	for (int i = 0; i < 4; i++) {
+          	  Client player = new Client("Player" + i);
+          	  player.start();
+			}
         	  
         }
 }
